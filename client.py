@@ -25,8 +25,13 @@ class Client:
 
 
     @staticmethod
-    def protocol_header_file_upload(filename_length, json_length, data_length):
+    def file_upload_protocol_header(filename_length, json_length, data_length):
         return filename_length.to_bytes(1, 'big') + json_length.to_bytes(3, 'big') + data_length.to_bytes(32, 'big')
+
+
+    @staticmethod
+    def file_edit_protocol_header(json_length, media_type_length, data_length):
+        return json_length.to_bytes(16, 'big') + media_type_length.to_bytes(1, 'big') +  data_length.to_bytes(47, 'big')
 
 
     @staticmethod
@@ -65,7 +70,7 @@ class Client:
                 filename_bits = file_name.encode('utf-8')
 
                 # ヘッダーの作成
-                header = Client.protocol_header_file_upload(len(filename_bits), 0, file_size)
+                header = Client.file_upload_protocol_header(len(filename_bits), 0, file_size)
                 # ヘッダーの送信
                 self.sock.send(header)
                 # ファイル名の送信
@@ -94,14 +99,22 @@ class Client:
 
 
     def edit_feature_handle(self, num):
-        # 圧縮
-        if num == 1:
-            print("Hello")
         # 編集終了→ソケットを閉じる
         if num == 6:
             print('Done your editting...')
             self.sock.close()
             sys.exit(1)
+        # else:
+        #     # JSONデータには使用したい機能の番号が入っている
+        #     json_data = json.dumps({'feature_id': num})
+        #     json_data_byte = json_data.encode('utf-8')
+        #     # media_type_lenghtは取り敢えず今回使用するmp4を0と見做して使用する
+        #     media_type_num = 0
+        #     # 🚨ここどうするんだっけ... 数値をそのままヘッダー関数に渡したらダメだろうなあ...
+        #     media_type_num_byte = media_type_num.int.to
+
+        #     # ヘッダーの作成
+        #     header = Client.file_edit_protocol_header(len(json_data_byte), media)
 
 
     def edit_file(self):
